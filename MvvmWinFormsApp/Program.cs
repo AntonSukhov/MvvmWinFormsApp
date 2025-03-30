@@ -1,4 +1,6 @@
-﻿using MvvmWinFormsApp.Views;
+﻿using CommonServiceLocator;
+using MvvmWinFormsApp.Creators;
+using MvvmWinFormsApp.Views;
 using System;
 using System.Windows.Forms;
 
@@ -14,6 +16,12 @@ namespace MvvmWinFormsApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            var serviceLocatorCreator = new AutofacServiceLocatorCreator();
+            var serviceLocatorImpl = serviceLocatorCreator.Create();
+
+            ServiceLocator.SetLocatorProvider(() => serviceLocatorImpl);
+
             Application.Run(new MainView());
         }
     }

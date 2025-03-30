@@ -1,8 +1,8 @@
-﻿using MvvmWinFormsApp.Commands;
+﻿using CommonServiceLocator;
+using MvvmWinFormsApp.Commands;
 using MvvmWinFormsApp.Common;
 using MvvmWinFormsApp.Models;
 using MvvmWinFormsApp.Services;
-using System;
 using System.Collections.Generic;
 
 namespace MvvmWinFormsApp.ViewModels
@@ -55,11 +55,10 @@ namespace MvvmWinFormsApp.ViewModels
 
         #region Конструкторы
 
-        public PersonDirectoryViewModel(IMessageBoxService messageBoxService, IDataSourceService dataSourceService)
+        public PersonDirectoryViewModel()
         {
-
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));
-            _dataSourceService = dataSourceService ?? throw new ArgumentNullException(nameof(dataSourceService));
+            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+            _dataSourceService = ServiceLocator.Current.GetInstance<IDataSourceService>();
 
             Persons = _dataSourceService.GetPersons();
 

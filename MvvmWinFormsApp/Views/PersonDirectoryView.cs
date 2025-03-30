@@ -1,5 +1,4 @@
 ﻿using MvvmWinFormsApp.Models;
-using MvvmWinFormsApp.Services;
 using MvvmWinFormsApp.ViewModels;
 using System.Windows.Forms;
 
@@ -9,8 +8,7 @@ namespace MvvmWinFormsApp.Views
     {
         #region Поля
 
-        private readonly PersonDirectoryViewModel _personDirectoryViewModel = new PersonDirectoryViewModel(
-            new MessageBoxService(), new DataSourceService());                                                  //TODO: получить сервисы MessageBoxService и DataSourceService  из глобальной коллекции сервисов.
+        private readonly PersonDirectoryViewModel _personDirectoryViewModel;
 
         #endregion
 
@@ -18,6 +16,8 @@ namespace MvvmWinFormsApp.Views
 
         public PersonDirectoryView()
         {
+            _personDirectoryViewModel = new PersonDirectoryViewModel();
+
             InitializeComponent();
             InitializeBindings();
         }

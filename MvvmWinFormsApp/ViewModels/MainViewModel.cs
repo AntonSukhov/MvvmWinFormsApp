@@ -1,8 +1,8 @@
-﻿using MvvmWinFormsApp.Commands;
+﻿using CommonServiceLocator;
+using MvvmWinFormsApp.Commands;
 using MvvmWinFormsApp.Common;
 using MvvmWinFormsApp.Services;
 using MvvmWinFormsApp.Views;
-using System;
 using System.Windows.Forms;
 
 namespace MvvmWinFormsApp.ViewModels
@@ -27,12 +27,9 @@ namespace MvvmWinFormsApp.ViewModels
 
         #region Конструкторы
 
-        public MainViewModel(IMessageBoxService messageBoxService)
+        public MainViewModel()
         {
-
-            _messageBoxService = messageBoxService ?? throw new ArgumentNullException(nameof(messageBoxService));        //TODO: избавиться от передачи сервисов через конструктор и
-                                                                                                                         //использовать глобальную коллекцию сервисов для получения сервиса.
-
+            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
             ShowPersonDirectoryCommand = new Command(ExecuteShowPersonDirectoryCommand);
         }
 

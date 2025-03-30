@@ -1,5 +1,4 @@
-﻿using MvvmWinFormsApp.Services;
-using MvvmWinFormsApp.ViewModels;
+﻿using MvvmWinFormsApp.ViewModels;
 using System;
 using System.Windows.Forms;
 
@@ -9,14 +8,14 @@ namespace MvvmWinFormsApp.Views
     {
         #region Поля
 
-        private readonly MainViewModel _mainViewModel = new MainViewModel(new MessageBoxService());  //TODO: создать MessageBoxService и зарегистрировать сервис в глобальную (по отношению к проекту)
-                                                                                                     //коллекцию сервисов.
+        private readonly MainViewModel _mainViewModel;
 
         #endregion
 
         public MainView()
         {
             InitializeComponent();
+            _mainViewModel = new MainViewModel();
         }
 
         #region Обработчики событий
