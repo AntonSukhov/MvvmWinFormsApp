@@ -1,2 +1,2 @@
 # MvvmWinFormsApp
-WinForms приложение MVVM и на .Net Framework.
+WinForms приложение на MVVM и на .Net Framework.
