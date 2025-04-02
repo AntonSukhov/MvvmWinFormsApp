@@ -58,12 +58,14 @@
   <ItemGroup>
     <Compile Include="Common\Command.cs" />
     <Compile Include="Common\NotifyPropertyChangedBase.cs" />
-    <Compile Include="Creators\AutofacServiceLocatorCreator.cs" />
-    <Compile Include="Creators\IServiceLocatorCreator.cs" />
+    <Compile Include="Common\Creators\AutofacServiceLocatorCreator.cs" />
+    <Compile Include="Common\Creators\IServiceLocatorCreator.cs" />
+    <Compile Include="Enums\WindowActionResult.cs" />
     <Compile Include="Models\PersonModel.cs" />
     <Compile Include="Services\DataSourceService.cs" />
     <Compile Include="Services\IDataSourceService.cs" />
     <Compile Include="Services\IMessageBoxService.cs" />
+    <Compile Include="Services\IWindowService.cs" />
     <Compile Include="Services\MessageBoxService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PersonDirectoryViewModel.cs" />
@@ -137,6 +139,9 @@
     <PackageReference Include="System.Threading.Tasks.Extensions">
       <Version>4.6.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\Builders\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,6 @@
 ﻿using CommonServiceLocator;
 
-namespace MvvmWinFormsApp.Creators
+namespace MvvmWinFormsApp.Common.Creators
 {
     /// <summary>
     /// Создатель локатора сервисов.

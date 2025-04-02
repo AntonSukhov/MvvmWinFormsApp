@@ -3,7 +3,7 @@ using Autofac.Extras.CommonServiceLocator;
 using CommonServiceLocator;
 using MvvmWinFormsApp.Services;
 
-namespace MvvmWinFormsApp.Creators
+namespace MvvmWinFormsApp.Common.Creators
 {
     /// <summary>
     /// Создатель локатора сервисов, работающего с IoC Autofac.

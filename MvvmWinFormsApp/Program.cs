@@ -1,5 +1,5 @@
 ﻿using CommonServiceLocator;
-using MvvmWinFormsApp.Creators;
+using MvvmWinFormsApp.Common.Creators;
 using MvvmWinFormsApp.Views;
 using System;
 using System.Windows.Forms;
