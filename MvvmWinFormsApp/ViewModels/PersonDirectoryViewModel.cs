@@ -57,8 +57,8 @@ namespace MvvmWinFormsApp.ViewModels
 
         public PersonDirectoryViewModel()
         {
-            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
-            _dataSourceService = ServiceLocator.Current.GetInstance<IDataSourceService>();
+            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>(ConstantsService.MessageBoxServiceName);
+            _dataSourceService = ServiceLocator.Current.GetInstance<IDataSourceService>(ConstantsService.DataSourceServiceName);
 
             Persons = _dataSourceService.GetPersons();
 

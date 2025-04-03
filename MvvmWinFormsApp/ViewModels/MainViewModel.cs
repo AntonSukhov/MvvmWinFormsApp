@@ -29,7 +29,7 @@ namespace MvvmWinFormsApp.ViewModels
 
         public MainViewModel()
         {
-            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>(ConstantsService.MessageBoxServiceName);
             ShowPersonDirectoryCommand = new Command(ExecuteShowPersonDirectoryCommand);
         }
 

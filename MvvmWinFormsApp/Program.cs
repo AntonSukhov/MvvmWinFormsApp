@@ -1,5 +1,7 @@
 ﻿using CommonServiceLocator;
+using MvvmWinFormsApp.Common;
 using MvvmWinFormsApp.Common.Creators;
+using MvvmWinFormsApp.Services;
 using MvvmWinFormsApp.Views;
 using System;
 using System.Windows.Forms;
@@ -9,7 +11,7 @@ namespace MvvmWinFormsApp
     internal static class Program
     {
         /// <summary>
-        /// The main entry point for the application.
+        /// Основная точка входа в приложение.
         /// </summary>
         [STAThread]
         static void Main()
@@ -17,12 +19,36 @@ namespace MvvmWinFormsApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var serviceLocatorCreator = new AutofacServiceLocatorCreator();
-            var serviceLocatorImpl = serviceLocatorCreator.Create();
-
-            ServiceLocator.SetLocatorProvider(() => serviceLocatorImpl);
+            GlobalRegisterDependencies();
 
             Application.Run(new MainView());
+        }
+
+        /// <summary>
+        /// Глобальная регистрация зависимостей.
+        /// </summary>
+        static void GlobalRegisterDependencies()
+        {
+            var registrationInfos = new[]
+           {
+                new RegistrationTypeInfo
+                {
+                    ImplementationType = typeof(MessageBoxService),
+                    InterfaceType = typeof(IMessageBoxService),
+                    KeyName = ConstantsService.MessageBoxServiceName
+                },
+                new RegistrationTypeInfo
+                {
+                    ImplementationType = typeof(DataSourceService),
+                    InterfaceType = typeof(IDataSourceService),
+                    KeyName = ConstantsService.DataSourceServiceName
+                }
+            };
+
+            var serviceLocatorCreator = new AutofacServiceLocatorCreator();
+            var serviceLocatorImpl = serviceLocatorCreator.Create(registrationInfos);
+
+            ServiceLocator.SetLocatorProvider(() => serviceLocatorImpl);
         }
     }
 }

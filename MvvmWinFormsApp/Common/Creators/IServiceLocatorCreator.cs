@@ -1,4 +1,5 @@
 ﻿using CommonServiceLocator;
+using System.Collections.Generic;
 
 namespace MvvmWinFormsApp.Common.Creators
 {
@@ -10,10 +11,18 @@ namespace MvvmWinFormsApp.Common.Creators
         #region Методы
 
         /// <summary>
-        /// Создаёт и предоставляет локатор сервисов.
+        /// 
         /// </summary>
-        /// <returns>Локатор сервисов.</returns>
-        public ServiceLocatorImplBase Create();
+        /// <param name="registrationTypeInfos"></param>
+        /// <returns></returns>
+        public ServiceLocatorImplBase Create(IEnumerable<RegistrationTypeInfo> registrationTypeInfos);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="registrationTypeInfos"></param>
+        /// <returns></returns>
+        public ServiceLocatorImplBase Create(IEnumerable<RegistrationInstanceInfo> registrationInstanceInfos);
 
         #endregion
     }

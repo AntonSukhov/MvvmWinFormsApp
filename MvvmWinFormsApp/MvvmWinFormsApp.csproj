@@ -60,8 +60,11 @@
     <Compile Include="Common\NotifyPropertyChangedBase.cs" />
     <Compile Include="Common\Creators\AutofacServiceLocatorCreator.cs" />
     <Compile Include="Common\Creators\IServiceLocatorCreator.cs" />
+    <Compile Include="Common\RegistrationInstanceInfo.cs" />
+    <Compile Include="Common\RegistrationTypeInfo.cs" />
     <Compile Include="Enums\WindowActionResult.cs" />
     <Compile Include="Models\PersonModel.cs" />
+    <Compile Include="Services\ConstantsService.cs" />
     <Compile Include="Services\DataSourceService.cs" />
     <Compile Include="Services\IDataSourceService.cs" />
     <Compile Include="Services\IMessageBoxService.cs" />
