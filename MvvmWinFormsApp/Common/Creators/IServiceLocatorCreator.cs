@@ -11,17 +11,17 @@ namespace MvvmWinFormsApp.Common.Creators
         #region Методы
 
         /// <summary>
-        /// 
+        /// Создаёт локатор сервисов.
         /// </summary>
-        /// <param name="registrationTypeInfos"></param>
-        /// <returns></returns>
+        /// <param name="registrationTypeInfos">Информация для автоматического создания и регистрации объектов в контейнере зависимостей.</param>
+        /// <returns>Локатор сервисов.</returns>
         public ServiceLocatorImplBase Create(IEnumerable<RegistrationTypeInfo> registrationTypeInfos);
 
         /// <summary>
-        /// 
+        /// Создаёт локатор сервисов.
         /// </summary>
-        /// <param name="registrationTypeInfos"></param>
-        /// <returns></returns>
+        /// <param name="registrationTypeInfos">Информация для регистрации объектов в контейнере зависимостей.</param>
+        /// <returns>Локатор сервисов.</returns>
         public ServiceLocatorImplBase Create(IEnumerable<RegistrationInstanceInfo> registrationInstanceInfos);
 
         #endregion

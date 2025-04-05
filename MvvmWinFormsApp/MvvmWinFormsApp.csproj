@@ -60,6 +60,7 @@
     <Compile Include="Common\NotifyPropertyChangedBase.cs" />
     <Compile Include="Common\Creators\AutofacServiceLocatorCreator.cs" />
     <Compile Include="Common\Creators\IServiceLocatorCreator.cs" />
+    <Compile Include="Common\RegistrationInfo.cs" />
     <Compile Include="Common\RegistrationInstanceInfo.cs" />
     <Compile Include="Common\RegistrationTypeInfo.cs" />
     <Compile Include="Enums\WindowActionResult.cs" />

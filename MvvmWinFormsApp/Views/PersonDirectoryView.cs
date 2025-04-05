@@ -16,9 +16,10 @@ namespace MvvmWinFormsApp.Views
 
         public PersonDirectoryView()
         {
+            InitializeComponent();
+
             _personDirectoryViewModel = new PersonDirectoryViewModel();
 
-            InitializeComponent();
             InitializeBindings();
         }
 

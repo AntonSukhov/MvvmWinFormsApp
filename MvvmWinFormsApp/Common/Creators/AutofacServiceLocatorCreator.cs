@@ -1,14 +1,14 @@
 ﻿using Autofac;
 using Autofac.Extras.CommonServiceLocator;
 using CommonServiceLocator;
-using MvvmWinFormsApp.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MvvmWinFormsApp.Common.Creators
 {
     /// <summary>
-    /// Создатель локатора сервисов, работающего с IoC Autofac.
+    /// Создатель локатора сервисов, работающего с Autofac.
     /// </summary>
     public class AutofacServiceLocatorCreator : IServiceLocatorCreator
     {
@@ -17,98 +17,125 @@ namespace MvvmWinFormsApp.Common.Creators
         /// <inheritdoc/>
         public ServiceLocatorImplBase Create(IEnumerable<RegistrationInstanceInfo> registrationInstanceInfos)
         {
-            var builder = new ContainerBuilder();
-
-            if (registrationInstanceInfos?.Count() > 0)
-            {
-                RegisterDependencies(builder, registrationInstanceInfos);
-            }
-
-            var container = builder.Build();
-
-            var serviceLocatorImpl = new AutofacServiceLocator(container);
-
-            return serviceLocatorImpl;
+            return CreateServiceLocator(containerBuilder => RegisterDependencies(containerBuilder, registrationInstanceInfos, RegisterInstance));
         }
 
         /// <inheritdoc/>
         public ServiceLocatorImplBase Create(IEnumerable<RegistrationTypeInfo> registrationTypeInfos)
         {
+            return CreateServiceLocator(containerBuilder => RegisterDependencies(containerBuilder, registrationTypeInfos, RegisterType));
+        }
+
+        #region Закрытые методы
+
+        /// <summary>
+        /// Создаёт локатор сервисов.
+        /// </summary>
+        /// <param name="registerDependenciesAction">Действие, регистрирующее зависимости.</param>
+        /// <returns>Локатор сервисов.</returns>
+        private ServiceLocatorImplBase CreateServiceLocator(Action<ContainerBuilder> registerDependenciesAction)
+        {
             var builder = new ContainerBuilder();
 
-            if (registrationTypeInfos?.Count() > 0)
-            {
-                RegisterDependencies(builder, registrationTypeInfos);
-            }
+            registerDependenciesAction(builder);
 
-            var container = builder.Build();
-
-            var serviceLocatorImpl = new AutofacServiceLocator(container);
-
-            return serviceLocatorImpl;
+            return new AutofacServiceLocator(builder.Build());
         }
 
         /// <summary>
-        /// Регистрация зависимостей в контейнере.
+        /// Регистрирует зависимости.
         /// </summary>
-        /// <param name="builder">Создатель контейнера.</param>
-        private void RegisterDependencies(ContainerBuilder builder)
+        /// <typeparam name="T"></typeparam>
+        /// <param name="containerBuilder">Создатель контейнера.</param>
+        /// <param name="registrationInfos">Коллекция с информацией о регистрируемых зависимостях.</param>
+        /// <param name="registerAction">Действие, регистрирующее зависимость.</param>
+        private void RegisterDependencies<T>(ContainerBuilder containerBuilder, IEnumerable<T> registrationInfos, Action<ContainerBuilder, T> registerAction)
         {
-            builder.RegisterType(typeof(MessageBoxService))
-                   .Named(ConstantsService.MessageBoxServiceName, typeof(IMessageBoxService));
-            builder.RegisterType(typeof(DataSourceService))
-                   .Named(ConstantsService.DataSourceServiceName, typeof(IDataSourceService));
-        }
-
-        /// <summary>
-        /// Регистрация зависимостей в контейнере.
-        /// </summary>
-        /// <param name="builder">Создатель контейнера.</param>
-        /// <param name="registrationTypeInfos"></param>
-        private void RegisterDependencies(ContainerBuilder builder, IEnumerable<RegistrationTypeInfo> registrationTypeInfos)
-        {
-            foreach (var registrationInfo in registrationTypeInfos)
+            if (registrationInfos?.Any() == true)
             {
-                var keyName = registrationInfo.KeyName;
-
-                if (string.IsNullOrEmpty(keyName))
+                foreach (var registrationInfo in registrationInfos)
                 {
-                    builder.RegisterType(registrationInfo.ImplementationType)
-                           .As(registrationInfo.InterfaceType);
+                    registerAction(containerBuilder, registrationInfo);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Регистрирует зависимость, которая автоматически создаётся по его типу.
+        /// </summary>
+        /// <param name="containerBuilder">Создатель контейнера.</param>
+        /// <param name="registrationTypeInfo"> Информация для автоматического создания и регистрации объекта в контейнер зависимостей.</param>
+        private void RegisterType(ContainerBuilder containerBuilder, RegistrationTypeInfo registrationTypeInfo)
+        {
+            if (string.IsNullOrEmpty(registrationTypeInfo.KeyName))
+            {
+                if (registrationTypeInfo.IsSingleton)
+                {
+                    containerBuilder.RegisterType(registrationTypeInfo.ImplementationType)
+                                    .As(registrationTypeInfo.InterfaceType)
+                                    .SingleInstance();
+                }
+                else
+                {
+                    containerBuilder.RegisterType(registrationTypeInfo.ImplementationType)
+                                    .As(registrationTypeInfo.InterfaceType);
+                }
+            }
+            else
+            {
+                if (registrationTypeInfo.IsSingleton)
+                {
+                    containerBuilder.RegisterType(registrationTypeInfo.ImplementationType)
+                                    .Named(registrationTypeInfo.KeyName, registrationTypeInfo.InterfaceType)
+                                    .SingleInstance();
                 }
                 else
                 {
 
-                    builder.RegisterType(registrationInfo.ImplementationType)
-                           .Named(registrationInfo.KeyName, registrationInfo.InterfaceType);
+                    containerBuilder.RegisterType(registrationTypeInfo.ImplementationType)
+                                    .Named(registrationTypeInfo.KeyName, registrationTypeInfo.InterfaceType);
                 }
             }
         }
 
         /// <summary>
-        /// Регистрация зависимостей в контейнере.
+        ///  Регистрирует ранее созданную зависимость.
         /// </summary>
-        /// <param name="builder">Создатель контейнера.</param>
-        /// <param name="registrationInstanceInfos"></param>
-        private void RegisterDependencies(ContainerBuilder builder, IEnumerable<RegistrationInstanceInfo> registrationInstanceInfos)
+        /// <param name="containerBuilder">Создатель контейнера.</param>
+        /// <param name="registrationInstanceInfo">Информация для регистрации ранее созданного (вне контейнера) объекта в контейнер зависимостей</param>
+        private void RegisterInstance(ContainerBuilder containerBuilder, RegistrationInstanceInfo registrationInstanceInfo)
         {
-            foreach (var registrationInfo in registrationInstanceInfos)
+            if (string.IsNullOrEmpty(registrationInstanceInfo.KeyName))
             {
-                var keyName = registrationInfo.KeyName;
-
-                if (string.IsNullOrEmpty(keyName))
+                if (registrationInstanceInfo.IsSingleton)
                 {
-                    builder.RegisterInstance(registrationInfo.ImplementationInstance)
-                           .As(registrationInfo.InterfaceType);
+                    containerBuilder.RegisterInstance(registrationInstanceInfo.ImplementationInstance)
+                                .As(registrationInstanceInfo.InterfaceType)
+                                .SingleInstance();
                 }
                 else
                 {
-
-                    builder.RegisterInstance(registrationInfo.ImplementationInstance)
-                           .Named(registrationInfo.KeyName, registrationInfo.InterfaceType);
+                    containerBuilder.RegisterInstance(registrationInstanceInfo.ImplementationInstance)
+                                    .As(registrationInstanceInfo.InterfaceType);
+                }
+            }
+            else
+            {
+                if (registrationInstanceInfo.IsSingleton)
+                {
+                    containerBuilder.RegisterInstance(registrationInstanceInfo.ImplementationInstance)
+                                .Named(registrationInstanceInfo.KeyName, registrationInstanceInfo.InterfaceType)
+                                .SingleInstance();
+                }
+                else
+                {
+                    containerBuilder.RegisterInstance(registrationInstanceInfo.ImplementationInstance)
+                                .Named(registrationInstanceInfo.KeyName, registrationInstanceInfo.InterfaceType);
                 }
             }
         }
+
+        #endregion
 
         #endregion
     }

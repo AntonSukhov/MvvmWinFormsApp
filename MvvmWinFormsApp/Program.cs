@@ -35,13 +35,21 @@ namespace MvvmWinFormsApp
                 {
                     ImplementationType = typeof(MessageBoxService),
                     InterfaceType = typeof(IMessageBoxService),
-                    KeyName = ConstantsService.MessageBoxServiceName
+                    KeyName = ConstantsService.MessageBoxServiceName,
+                    IsSingleton = true,
                 },
                 new RegistrationTypeInfo
                 {
                     ImplementationType = typeof(DataSourceService),
                     InterfaceType = typeof(IDataSourceService),
-                    KeyName = ConstantsService.DataSourceServiceName
+                    KeyName = ConstantsService.DataSourceServiceName,
+                    IsSingleton= true
+                },
+                new RegistrationTypeInfo
+                {
+                    ImplementationType= typeof(PersonDirectoryView),
+                    InterfaceType = typeof(Form),
+                    KeyName = ConstantsService.PersonDirectoryViewName
                 }
             };
 
