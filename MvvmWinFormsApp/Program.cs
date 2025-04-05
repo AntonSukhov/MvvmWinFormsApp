@@ -48,7 +48,7 @@ namespace MvvmWinFormsApp
                 new RegistrationTypeInfo
                 {
                     ImplementationType= typeof(PersonDirectoryView),
-                    InterfaceType = typeof(Form),
+                    InterfaceType = typeof(IWindowService),
                     KeyName = ConstantsService.PersonDirectoryViewName
                 }
             };

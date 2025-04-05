@@ -71,6 +71,9 @@
     <Compile Include="Services\IMessageBoxService.cs" />
     <Compile Include="Services\IWindowService.cs" />
     <Compile Include="Services\MessageBoxService.cs" />
+    <Compile Include="Services\WindowService.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\PersonDirectoryViewModel.cs" />
     <Compile Include="Views\MainView.cs">

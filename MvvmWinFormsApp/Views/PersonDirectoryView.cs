@@ -1,10 +1,10 @@
 ﻿using MvvmWinFormsApp.Models;
+using MvvmWinFormsApp.Services;
 using MvvmWinFormsApp.ViewModels;
-using System.Windows.Forms;
 
 namespace MvvmWinFormsApp.Views
 {
-    public partial class PersonDirectoryView : Form
+    public partial class PersonDirectoryView : WindowService
     {
         #region Поля
 

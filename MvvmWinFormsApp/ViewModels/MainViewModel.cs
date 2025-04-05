@@ -2,7 +2,6 @@
 using MvvmWinFormsApp.Commands;
 using MvvmWinFormsApp.Common;
 using MvvmWinFormsApp.Services;
-using System.Windows.Forms;
 
 namespace MvvmWinFormsApp.ViewModels
 {
@@ -38,9 +37,9 @@ namespace MvvmWinFormsApp.ViewModels
 
         private void ExecuteShowPersonDirectoryCommand(object parameter)
         {
-            var owner = parameter as Form;                                                                                //TODO:  избавиться от прямой зависимости от класса Form.
-            var personDirectoryView = ServiceLocator.Current.GetInstance<Form>(ConstantsService.PersonDirectoryViewName);
-            personDirectoryView.MdiParent = owner;
+            var owner = parameter as IWindowService;
+            var personDirectoryView = ServiceLocator.Current.GetInstance<IWindowService>(ConstantsService.PersonDirectoryViewName);
+            personDirectoryView.SetMdiParent(owner);
 
             personDirectoryView.Show();
         }

@@ -1,10 +1,10 @@
-﻿using MvvmWinFormsApp.ViewModels;
+﻿using MvvmWinFormsApp.Services;
+using MvvmWinFormsApp.ViewModels;
 using System;
-using System.Windows.Forms;
 
 namespace MvvmWinFormsApp.Views
 {
-    public partial class MainView : Form
+    public partial class MainView : WindowService
     {
         #region Поля
 
