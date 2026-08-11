@@ -1,7 +1,6 @@
-﻿using CommonServiceLocator;
-using MvvmWinFormsApp.Common;
-using MvvmWinFormsApp.Common.Creators;
-using MvvmWinFormsApp.Services;
+﻿using MvvmWinFormsApp.DependencyConfiguration;
+using MvvmWinFormsApp.Factories;
+using MvvmWinFormsApp.ViewModels;
 using MvvmWinFormsApp.Views;
 using System;
 using System.Windows.Forms;
@@ -19,44 +18,22 @@ namespace MvvmWinFormsApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            GlobalRegisterDependencies();
+            // Получаем контейнер из настроек
+            var container = CompositionRoot.BuildContainer();
 
-            Application.Run(new MainView());
-        }
+            // Создаём scope — он живёт всё время работы приложения
+            using (var scope = container.BeginLifetimeScope())
+            {
+                // Фабрика знает про Autofac, но View об этом не догадывается
+                var windowFactory = new WindowServiceFactory(scope);
 
-        /// <summary>
-        /// Глобальная регистрация зависимостей.
-        /// </summary>
-        static void GlobalRegisterDependencies()
-        {
-            var registrationInfos = new[]
-           {
-                new RegistrationTypeInfo
-                {
-                    ImplementationType = typeof(MessageBoxService),
-                    InterfaceType = typeof(IMessageBoxService),
-                    KeyName = ConstantsService.MessageBoxServiceName,
-                    IsSingleton = true,
-                },
-                new RegistrationTypeInfo
-                {
-                    ImplementationType = typeof(DataSourceService),
-                    InterfaceType = typeof(IDataSourceService),
-                    KeyName = ConstantsService.DataSourceServiceName,
-                    IsSingleton= true
-                },
-                new RegistrationTypeInfo
-                {
-                    ImplementationType= typeof(PersonDirectoryView),
-                    InterfaceType = typeof(IWindowService),
-                    KeyName = ConstantsService.PersonDirectoryViewName
-                }
-            };
+                var mainViewModel = new MainViewModel(windowFactory);
 
-            var serviceLocatorCreator = new AutofacServiceLocatorCreator();
-            var serviceLocatorImpl = serviceLocatorCreator.Create(registrationInfos);
+                var mainView = new MainView(mainViewModel);
 
-            ServiceLocator.SetLocatorProvider(() => serviceLocatorImpl);
+                // Запускаем приложение
+                Application.Run(mainView);
+            }
         }
     }
 }

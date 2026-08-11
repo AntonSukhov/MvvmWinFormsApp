@@ -7,8 +7,7 @@ namespace MvvmWinFormsApp.Services
     /// </summary>
     public interface IWindowService
     {
-        #region Методы
-
+ 
         /// <summary>
         /// Показывает окно.
         /// </summary>
@@ -39,6 +38,5 @@ namespace MvvmWinFormsApp.Services
         /// <param name="parent">Родительское MDI-окно.</param>
         public void SetMdiParent(IWindowService parent);
 
-        #endregion
     }
 }

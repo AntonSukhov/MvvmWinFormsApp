@@ -1,49 +1,32 @@
-﻿using CommonServiceLocator;
-using MvvmWinFormsApp.Commands;
+﻿using MvvmWinFormsApp.Commands;
 using MvvmWinFormsApp.Common;
+using MvvmWinFormsApp.Factories;
 using MvvmWinFormsApp.Services;
+using System;
 
 namespace MvvmWinFormsApp.ViewModels
 {
     public class MainViewModel : NotifyPropertyChangedBase
     {
-        #region Поля
+        private readonly IWindowServiceFactory _windowFactory;
 
-        private readonly IMessageBoxService _messageBoxService;
+        public RelayCommand ShowPersonDirectoryCommand { get; }
 
-        #endregion
-
-        #region Свойства
-
-        #region Команды
-
-        public Command ShowPersonDirectoryCommand { get; }
-
-        #endregion
-
-        #endregion
-
-        #region Конструкторы
-
-        public MainViewModel()
+        public MainViewModel(IWindowServiceFactory windowFactory)
         {
-            _messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>(ConstantsService.MessageBoxServiceName);
-            ShowPersonDirectoryCommand = new Command(ExecuteShowPersonDirectoryCommand);
+            _windowFactory = windowFactory ?? throw new ArgumentNullException(nameof(windowFactory));
+
+            ShowPersonDirectoryCommand = new RelayCommand(ExecuteShowPersonDirectoryCommand);
         }
-
-        #endregion
-
-        #region Методы
 
         private void ExecuteShowPersonDirectoryCommand(object parameter)
         {
             var owner = parameter as IWindowService;
-            var personDirectoryView = ServiceLocator.Current.GetInstance<IWindowService>(ConstantsService.PersonDirectoryViewName);
-            personDirectoryView.SetMdiParent(owner);
 
+            var personDirectoryView = _windowFactory.CreatePersonDirectoryWindow();
+
+            personDirectoryView.SetMdiParent(owner);
             personDirectoryView.Show();
         }
-
-        #endregion
     }
 }

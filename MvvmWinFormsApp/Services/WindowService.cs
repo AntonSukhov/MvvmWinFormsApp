@@ -8,12 +8,13 @@ namespace MvvmWinFormsApp.Services
     /// </summary>
     public class WindowService : Form, IWindowService
     {
-        #region Свойства
-
         ///<inheritdoc/>   
         public void SetMdiParent(IWindowService parent)
         {
-            MdiParent = parent as Form;
+            if (parent is Form formOwner)
+            {
+                MdiParent = formOwner;
+            }
         }
 
         ///<inheritdoc/>
@@ -28,6 +29,5 @@ namespace MvvmWinFormsApp.Services
         ///<inheritdoc/>
         public WindowActionResult ShowDialog(IWindowService owner) => (WindowActionResult)ShowDialog(owner as IWin32Window);
 
-        #endregion
     }
 }

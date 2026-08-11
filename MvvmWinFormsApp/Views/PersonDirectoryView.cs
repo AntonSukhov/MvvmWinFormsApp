@@ -1,31 +1,22 @@
 ﻿using MvvmWinFormsApp.Models;
 using MvvmWinFormsApp.Services;
 using MvvmWinFormsApp.ViewModels;
+using System;
 
 namespace MvvmWinFormsApp.Views
 {
     public partial class PersonDirectoryView : WindowService
     {
-        #region Поля
-
         private readonly PersonDirectoryViewModel _personDirectoryViewModel;
 
-        #endregion
-
-        #region Конструкторы
-
-        public PersonDirectoryView()
+        public PersonDirectoryView(PersonDirectoryViewModel viewModel)
         {
             InitializeComponent();
 
-            _personDirectoryViewModel = new PersonDirectoryViewModel();
+            _personDirectoryViewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
 
             InitializeBindings();
         }
-
-        #endregion
-
-        #region Методы
 
         private void InitializeBindings()
         {
@@ -36,13 +27,9 @@ namespace MvvmWinFormsApp.Views
             _personDirectoryViewModel.ShowPersonCommand.CanExecuteChanged += ShowPersonCommand_CanExecuteChanged;
         }
 
-        #region Обработчики событий
-
-
         private void ShowPersonCommand_CanExecuteChanged(object sender, System.EventArgs e)
         {
-            var canExecute = _personDirectoryViewModel.ShowPersonCommand.CanExecute(null);
-            tsbShowPerson.Enabled = canExecute;
+            tsbShowPerson.Enabled = _personDirectoryViewModel.ShowPersonCommand.CanExecute(null);
         }
 
         private void DgvPersons_SelectionChanged(object sender, System.EventArgs e)
@@ -56,15 +43,8 @@ namespace MvvmWinFormsApp.Views
             }
         }
 
-        private void BtnShowPerson_Click(object sender, System.EventArgs e)
-        {
-            ShowPerson();
-        }
-
-        private void TsbShowPerson_Click(object sender, System.EventArgs e)
-        {
-            ShowPerson();
-        }
+        private void BtnShowPerson_Click(object sender, System.EventArgs e) => ShowPerson();
+        private void TsbShowPerson_Click(object sender, System.EventArgs e) => ShowPerson();
 
         private void ShowPerson()
         {
@@ -73,10 +53,5 @@ namespace MvvmWinFormsApp.Views
                 _personDirectoryViewModel.ShowPersonCommand.Execute(null);
             }
         }
-
-        #endregion
-
-        #endregion
-
     }
 }

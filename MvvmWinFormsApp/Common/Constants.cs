@@ -1,9 +1,9 @@
-﻿namespace MvvmWinFormsApp.Services
+﻿namespace MvvmWinFormsApp.Common
 {
     /// <summary>
     /// 
     /// </summary>
-    public sealed class ConstantsService
+    public sealed class Constants
     {
         public const string MessageBoxServiceName = "MessageBoxService";
         public const string DataSourceServiceName = "DataSourceService";

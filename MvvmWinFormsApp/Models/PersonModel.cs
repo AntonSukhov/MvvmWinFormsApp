@@ -11,19 +11,19 @@ namespace MvvmWinFormsApp.Models
         public int Id 
         {
             get => _id;
-            set => SetValue(ref _id, value, nameof(Id));
+            set => SetProperty(ref _id, value, nameof(Id));
         }
 
         public string Name 
         { 
             get => _name; 
-            set => SetValue(ref _name, value, nameof(Name)); 
+            set => SetProperty(ref _name, value, nameof(Name)); 
         }
 
         public int Age
         {
             get => _age;
-            set => SetValue(ref _age, value, nameof(Age));
+            set => SetProperty(ref _age, value, nameof(Age));
         }
 
         public override string ToString()

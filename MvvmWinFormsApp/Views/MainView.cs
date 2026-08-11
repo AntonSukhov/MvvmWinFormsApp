@@ -6,19 +6,13 @@ namespace MvvmWinFormsApp.Views
 {
     public partial class MainView : WindowService
     {
-        #region Поля
+        private readonly MainViewModel _viewModel;
 
-        private readonly MainViewModel _mainViewModel;
-
-        #endregion
-
-        public MainView()
+        public MainView(MainViewModel viewModel)
         {
             InitializeComponent();
-            _mainViewModel = new MainViewModel();
+            _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         }
-
-        #region Обработчики событий
 
         private void TsmiPersonDirectory_Click(object sender, EventArgs e)
         {
@@ -35,10 +29,7 @@ namespace MvvmWinFormsApp.Views
         /// </summary>
         private void ShowPersonDirectory()
         {
-            _mainViewModel.ShowPersonDirectoryCommand.Execute(this);
+            _viewModel.ShowPersonDirectoryCommand.Execute(this);
         }
-
-        #endregion
-
     }
 }

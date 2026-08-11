@@ -6,34 +6,36 @@ namespace MvvmWinFormsApp.Commands
     /// <summary>
     /// Базовая команда.
     /// </summary>
-    public class Command : ICommand
+    public class RelayCommand : ICommand
     {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
         /// <inheritdoc/>
         public event EventHandler CanExecuteChanged;
 
-        readonly Action<object> _execute;
-        readonly Predicate<object> _canExecute;
-
-        public Command(Action<object> execute, Predicate<object> canExecute = null)
+        /// <summary>
+        /// Инициализация экземпляра <see cref="RelayCommand"/>.
+        /// </summary>
+        /// <param name="execute"></param>
+        /// <param name="canExecute"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
-        #region Методы
-
         /// <inheritdoc/>
         public void Execute(object parameter)
         {
-            _execute.Invoke(parameter);
+            _execute(parameter);
         }
 
         /// <inheritdoc/>
         public bool CanExecute(object parameter)
         {
-            var canExecute = _canExecute?.Invoke(parameter) ?? true;
-
-            return canExecute;
+            return _canExecute != null && _canExecute(parameter);
         }
 
         /// <summary>
@@ -41,9 +43,13 @@ namespace MvvmWinFormsApp.Commands
         /// </summary>
         public void RaiseCanExecuteChanged()
         {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+            var handler = CanExecuteChanged;
+
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
-        #endregion
     }
 }
