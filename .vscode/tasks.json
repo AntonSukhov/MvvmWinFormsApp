@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "process",
+      "command": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe",
+      "args": [
+        "${workspaceFolder}/MvvmWinFormsApp/MvvmWinFormsApp.csproj",
+        "/t:Build",
+        "/p:Configuration=Debug"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
