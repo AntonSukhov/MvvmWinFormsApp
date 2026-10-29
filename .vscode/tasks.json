@@ -3,12 +3,26 @@
   "tasks": [
     {
       "label": "build",
+      "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
       "type": "process",
-      "command": "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/amd64/MSBuild.exe",
       "args": [
         "${workspaceFolder}/MvvmWinFormsApp/MvvmWinFormsApp.csproj",
-        "/t:Build",
-        "/p:Configuration=Debug"
+        "/p:Configuration=Debug",
+        "/v:m"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "restore",
+      "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+      "type": "process",
+      "args": [
+        "${workspaceFolder}/MvvmWinFormsApp/MvvmWinFormsApp.csproj",
+        "-t:Restore"
       ],
       "problemMatcher": "$msCompile"
     }
