@@ -7,20 +7,17 @@ using System.Collections.Generic;
 
 namespace MvvmWinFormsApp.ViewModels
 {
-    public class PersonDirectoryViewModel : NotifyPropertyChangedBase
+    public class PersonDirectoryViewModel : DynamicNotifyPropertyChangedBase
     {
         private readonly IMessageBoxService _messageBoxService;
         private readonly IDataSourceService _dataSourceService;
 
-        private PersonModel _person;
-        private IList<PersonModel> _persons;
-
         public IList<PersonModel> Persons
         {
-            get => _persons;
+            get => GetValue<IList<PersonModel>>(nameof(Persons));
             set
             {
-                if (SetProperty(ref _persons, value, nameof(Persons)))
+                if (SetValue(value, nameof(Persons)))
                 {
                     ShowPersonCommand?.RaiseCanExecuteChanged();
                 }
@@ -29,10 +26,10 @@ namespace MvvmWinFormsApp.ViewModels
 
         public PersonModel Person
         {
-            get => _person;
+            get => GetValue<PersonModel>(nameof(Person));
             set
             {
-                if (SetProperty(ref _person, value, nameof(Person)))
+                if (SetValue(value, nameof(Person)))
                 {
                     ShowPersonCommand?.RaiseCanExecuteChanged();
                 }

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\NotifyPropertyChangedBase.cs" />
+    <Compile Include="Common\DynamicNotifyPropertyChangedBase.cs" />
     <Compile Include="DependencyConfiguration\CompositionRoot.cs" />
     <Compile Include="Enums\WindowActionResult.cs" />
     <Compile Include="Factories\IWindowServiceFactory.cs" />

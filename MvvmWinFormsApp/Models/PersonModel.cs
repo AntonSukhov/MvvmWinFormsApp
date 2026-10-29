@@ -2,28 +2,24 @@
 
 namespace MvvmWinFormsApp.Models
 {
-    public class PersonModel: NotifyPropertyChangedBase
+    public class PersonModel : DynamicNotifyPropertyChangedBase
     {
-        private int _id;
-        private string _name = string.Empty;
-        private int _age;
-
-        public int Id 
+        public int Id
         {
-            get => _id;
-            set => SetProperty(ref _id, value, nameof(Id));
+            get => GetValue<int>(nameof(Id));
+            set => SetValue(value, nameof(Id));
         }
 
-        public string Name 
-        { 
-            get => _name; 
-            set => SetProperty(ref _name, value, nameof(Name)); 
+        public string Name
+        {
+            get => GetValue<string>(nameof(Name));
+            set => SetValue(value, nameof(Name));
         }
 
         public int Age
         {
-            get => _age;
-            set => SetProperty(ref _age, value, nameof(Age));
+            get => GetValue<int>(nameof(Age));
+            set => SetValue(value, nameof(Age));
         }
 
         public override string ToString()
