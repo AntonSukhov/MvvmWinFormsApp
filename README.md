@@ -1,108 +1,155 @@
 # MvvmWinFormsApp
 
-Windows Forms application (**.NET Framework 4.7**, C# 8.0) built with the **MVVM** pattern and **Autofac** dependency injection, for browsing a **person directory** (Person).
+Windows Forms-приложение (**.NET Framework 4.8**, C# 8.0), построенное по паттерну **MVVM** с внедрением зависимостей через **Autofac**, для просмотра **справочника персон** (Person).
 
 ---
 
-## Table of Contents
+## Содержание
 
-1. [General Architecture](#general-architecture)
-2. [Folders and Purpose](#folders-and-purpose)
-3. [Project Dependency Diagram](#project-dependency-diagram)
-4. [UML Class Diagram of the Person Domain](#uml-class-diagram-of-the-person-domain)
-5. [Dependency Injection (Autofac)](#dependency-injection-autofac)
-6. [Build and Run](#build-and-run)
+1. [Общая архитектура](#общая-архитектура)
+2. [Структура проекта](#структура-проекта)
+3. [Диаграмма зависимостей](#диаграмма-зависимостей)
+4. [Диаграмма классов домена «Персона»](#диаграмма-классов-домена-персона)
+5. [Внедрение зависимостей (Autofac)](#внедрение-зависимостей-autofac)
+6. [Сборка и запуск](#сборка-и-запуск)
 
 ---
 
-## General Architecture
+## Общая архитектура
 
-The project applies the **MVVM** (Model – View – ViewModel) pattern on top of WinForms. Views know only about their ViewModels; ViewModels know only about services and models through **abstractions** (interfaces). Concrete implementations are wired only at the composition point — `Program.Main` together with `CompositionRoot` (Composition Root).
+Проект реализует паттерн **MVVM** (Model – View – ViewModel) поверх WinForms. Views знают только о своих ViewModels; ViewModels работают с сервисами и моделями исключительно через **абстракции** (интерфейсы). Конкретные реализации связываются только в точке композиции — `Program.Main` совместно с `CompositionRoot`.
 
 ```mermaid
 flowchart TB
-    User["👤 User<br/>(mouse / keyboard)"]
+    User["👤 Пользователь<br/>(мышь / клавиатура)"]
 
-    subgraph Presentation ["Presentation Layer"]
+    subgraph Presentation ["Слой представления"]
         Views["Views<br/>(MainView, PersonDirectoryView : Form)"]
     end
 
-    subgraph ViewModelLayer ["ViewModel Layer"]
+    subgraph ViewModelLayer ["Слой ViewModel"]
         ViewModels["ViewModels<br/>(MainViewModel, PersonDirectoryViewModel)"]
         Commands["Commands<br/>(RelayCommand : ICommand)"]
     end
 
-    subgraph Services ["Service Layer"]
+    subgraph Services ["Слой сервисов"]
         WindowService["WindowService : Form, IWindowService"]
         MessageBoxService["MessageBoxService<br/>: IMessageBoxService"]
         DataSourceService["DataSourceService<br/>: IDataSourceService"]
     end
 
-    subgraph Models ["Model Layer"]
+    subgraph Models ["Слой моделей"]
         ModelsLayer["Models<br/>(PersonModel)"]
     end
 
-    subgraph Infrastructure ["Infrastructure"]
-        CompositionRoot["CompositionRoot<br/>(Autofac container)"]
+    subgraph Infrastructure ["Инфраструктура"]
+        CompositionRoot["CompositionRoot<br/>(контейнер Autofac)"]
         Factory["WindowServiceFactory<br/>: IWindowServiceFactory"]
-        Common["Common<br/>(NotifyPropertyChangedBase,<br/>RelayCommand, Constants)"]
+        Common["Common<br/>(NotifyPropertyChangedBase,<br/>DynamicNotifyPropertyChangedBase,<br/>RelayCommand, Constants)"]
     end
 
-    User -->|interacts with| Views
-    Views -->|data binding| ViewModels
-    ViewModels -->|expose| Commands
-    ViewModels -->|call via interfaces| MessageBoxService
-    ViewModels -->|call via interfaces| DataSourceService
-    ViewModels -->|create windows via| Factory
-    Factory -->|resolves services| CompositionRoot
-    DataSourceService -->|returns| ModelsLayer
-    ViewModels -->|bind to| ModelsLayer
-    Views -.->|inherit window behavior| WindowService
+    User -->|взаимодействует с| Views
+    Views -->|привязка данных| ViewModels
+    ViewModels -->|выставляют| Commands
+    ViewModels -->|вызов через интерфейсы| MessageBoxService
+    ViewModels -->|вызов через интерфейсы| DataSourceService
+    ViewModels -->|создание окон через| Factory
+    Factory -->|разрешение сервисов| CompositionRoot
+    DataSourceService -->|возвращает| ModelsLayer
+    ViewModels -->|привязка к| ModelsLayer
+    Views -.->|наследование поведения окна| WindowService
     Common --- ViewModels
     Common --- ModelsLayer
 ```
 
-**Key principles:**
+**Ключевые принципы:**
 
-| Principle | How it is implemented |
+| Принцип | Реализация |
 |---|---|
-| Separation of concerns | `View` (UI only) / `ViewModel` (presentation logic) / `Model` (data) / `Service` (business data and UI wrappers) |
-| Dependency Inversion | ViewModels depend on `IMessageBoxService`, `IDataSourceService`, `IWindowServiceFactory` — not on implementations |
-| Composition Root | All «interface → implementation» bindings live in `DependencyConfiguration/CompositionRoot.cs` |
-| Testability | ViewModels are UI-framework-agnostic (no direct `MessageBox`/`Form` calls), so they can be unit tested with mocks |
-| Observable bindings | `NotifyPropertyChangedBase.SetProperty` raises `PropertyChanged` for data binding |
+| Разделение ответственности | `View` (только UI) / `ViewModel` (презентационная логика) / `Model` (данные) / `Service` (данные и UI-обёртки) |
+| Инверсия зависимостей | ViewModels зависят от `IMessageBoxService`, `IDataSourceService`, `IWindowServiceFactory` — не от реализаций |
+| Composition Root | Все привязки «интерфейс → реализация» в `DependencyConfiguration/CompositionRoot.cs` |
+| Тестируемость | ViewModels не содержат прямых вызовов `MessageBox`/`Form`, что позволяет покрывать их юнит-тестами с моками |
+| Наблюдаемые привязки | `NotifyPropertyChangedBase.SetValue` и `DynamicNotifyPropertyChangedBase.SetValue` генерируют `PropertyChanged` для data binding |
 
 ---
 
-## Folders and Purpose
+## Структура проекта
 
-| Folder / File | Layer | Purpose |
+```
+MvvmWinFormsApp/
+├── MvvmWinFormsApp.sln              # Решение (1 проект)
+├── README.md
+└── MvvmWinFormsApp/
+    ├── Program.cs                   # Точка входа
+    ├── App.config                   # Конфигурация (binding redirects)
+    ├── MvvmWinFormsApp.csproj       # Проект (net48, LangVersion 8.0)
+    ├── Common/                      # Общие утилиты
+    │   ├── Constants.cs             # Имена сервисов для named-регистраций
+    │   ├── NotifyPropertyChangedBase.cs
+    │   ├── DynamicNotifyPropertyChangedBase.cs
+    │   └── RelayCommand.cs          # namespace MvvmWinFormsApp.Commands
+    ├── DependencyConfiguration/
+    │   └── CompositionRoot.cs       # Сборка контейнера Autofac
+    ├── Enums/
+    │   └── WindowActionResult.cs    # None / OK / Cancel / Yes / No
+    ├── Factories/
+    │   ├── IWindowServiceFactory.cs
+    │   └── WindowServiceFactory.cs
+    ├── Models/
+    │   └── PersonModel.cs
+    ├── Services/
+    │   ├── IWindowService.cs
+    │   ├── WindowService.cs
+    │   ├── IMessageBoxService.cs
+    │   ├── MessageBoxService.cs
+    │   ├── IDataSourceService.cs
+    │   └── DataSourceService.cs
+    ├── ViewModels/
+    │   ├── MainViewModel.cs
+    │   └── PersonDirectoryViewModel.cs
+    ├── Views/
+    │   ├── MainView.cs / .Designer.cs / .resx
+    │   └── PersonDirectoryView.cs / .Designer.cs / .resx
+    └── Properties/                  # AssemblyInfo, Resources, Settings
+```
+
+| Папка / Файл | Слой | Назначение |
 |---|---|---|
-| `Program.cs` | Entry point | Builds the Autofac container, creates the main window and starts the app |
-| `Views/` | View | WinForms forms (`MainView`, `PersonDirectoryView`), data-bound to ViewModels |
-| `ViewModels/` | ViewModel | Presentation logic (`MainViewModel`, `PersonDirectoryViewModel`), expose `RelayCommand`s |
-| `Models/` | Model | Domain data (`PersonModel`: Id, Name, Age) |
-| `Services/` | Service | `IWindowService` / `WindowService` (form behavior: Show, ShowDialog, SetMdiParent), `IMessageBoxService` / `MessageBoxService` (message boxes), `IDataSourceService` / `DataSourceService` (person data source) |
-| `Factories/` | Infrastructure | `IWindowServiceFactory` / `WindowServiceFactory` — creates View + ViewModel pairs from the DI scope |
-| `DependencyConfiguration/` | Infrastructure | `CompositionRoot` — builds the Autofac container and registers named singletons |
-| `Common/` | Shared | `NotifyPropertyChangedBase` (INotifyPropertyChanged), `RelayCommand` (ICommand), `Constants` (service names) |
-| `Enums/` | Shared | `WindowActionResult` (None / OK / Cancel / Yes / No) |
+| `Program.cs` | Точка входа | Строит контейнер Autofac, создаёт главное окно и запускает приложение |
+| `Views/` | View | Формы WinForms (`MainView` — MDI-родитель с MenuStrip/ToolStrip, `PersonDirectoryView` — MDI-потомок с DataGridView), привязаны к ViewModels |
+| `ViewModels/` | ViewModel | Презентационная логика (`MainViewModel`, `PersonDirectoryViewModel`), выставляют `RelayCommand` |
+| `Models/` | Model | Доменные данные (`PersonModel`: Id, Name, Age) |
+| `Services/` | Service | `IWindowService` / `WindowService` (поведение окна: Show, ShowDialog, SetMdiParent), `IMessageBoxService` / `MessageBoxService` (сообщения), `IDataSourceService` / `DataSourceService` (источник данных) |
+| `Factories/` | Инфраструктура | `IWindowServiceFactory` / `WindowServiceFactory` — создаёт пары View + ViewModel из DI-scope |
+| `DependencyConfiguration/` | Инфраструктура | `CompositionRoot` — строит контейнер Autofac, регистрирует named singletons |
+| `Common/` | Общий | `NotifyPropertyChangedBase`, `DynamicNotifyPropertyChangedBase`, `RelayCommand` (namespace `MvvmWinFormsApp.Commands`), `Constants` |
+| `Enums/` | Общий | `WindowActionResult` (None / OK / Cancel / Yes / No) |
+
+### Базовые классы Common
+
+| Класс | Назначение |
+|---|---|
+| `NotifyPropertyChangedBase` | Абстрактный класс: реализует `INotifyPropertyChanged`, метод `SetValue<T>(ref T field, T value, string propertyName)` — сравнение и уведомление |
+| `DynamicNotifyPropertyChangedBase` | Наследник `NotifyPropertyChangedBase`: хранит свойства в `Dictionary<string, object>`, методы `GetValue<T>(propertyName)` / `SetValue<T>(value, propertyName)` — свойства без backing-полей |
+| `RelayCommand` | `ICommand` с делегатами `execute`/`canExecute`, метод `RaiseCanExecuteChanged()` (namespace `MvvmWinFormsApp.Commands`) |
+| `Constants` | Константы имён для named-регистраций Autofac |
 
 ---
 
-## Project Dependency Diagram
+## Диаграмма зависимостей
 
-Arrow direction means «depends on». ViewModels and Models depend only on abstractions and `Common`; only the composition point touches concrete services and Autofac.
+Направление стрелки означает «зависит от». ViewModels и Models зависят только от абстракций и `Common`; конкретные сервисы и Autofac известны только точке композиции.
 
 ```mermaid
 flowchart TD
-    Program["Program.cs<br/>(Entry point)"]
+    Program["Program.cs<br/>(точка входа)"]
     Views["Views"]
     ViewModels["ViewModels"]
     Models["Models"]
     Factory["Factories<br/>(WindowServiceFactory)"]
-    Services["Services<br/>(implementations)"]
-    ServiceAbstractions["Service interfaces<br/>(IWindowService, IMessageBoxService,<br/>IDataSourceService, IWindowServiceFactory)"]
+    Services["Services<br/>(реализации)"]
+    ServiceAbstractions["Интерфейсы сервисов<br/>(IWindowService, IMessageBoxService,<br/>IDataSourceService, IWindowServiceFactory)"]
     Common["Common"]
     CompositionRoot["DependencyConfiguration<br/>(CompositionRoot)"]
 
@@ -118,9 +165,8 @@ flowchart TD
     Factory --> ServiceAbstractions
     Factory --> Views
     Factory --> ViewModels
-    Factory --> CompositionRoot
-    Services -.->|implements| ServiceAbstractions
     CompositionRoot --> Services
+    Services -.->|реализуют| ServiceAbstractions
 
     style Program fill:#4472c4,color:#fff
     style ServiceAbstractions fill:#70ad47,color:#fff
@@ -130,9 +176,9 @@ flowchart TD
 
 ---
 
-## UML Class Diagram of the Person Domain
+## Диаграмма классов домена «Персона»
 
-End-to-end data path through the layers: `DataSourceService` → `PersonModel` → `PersonDirectoryViewModel` → data binding → `PersonDirectoryView`. The ViewModel never touches WinForms UI types directly.
+Сквозной путь данных: `DataSourceService` → `PersonModel` → `PersonDirectoryViewModel` → привязка данных → `PersonDirectoryView`. ViewModel не обращается к UI-типам WinForms напрямую.
 
 ```mermaid
 classDiagram
@@ -156,15 +202,29 @@ classDiagram
         +ShowConfirmation(message, title) bool
     }
 
+    class NotifyPropertyChangedBase {
+        <<abstract>>
+        +PropertyChanged : event
+        #OnPropertyChanged(propertyName)
+        #SetValue~T~(ref field, value, propertyName) bool
+    }
+    class DynamicNotifyPropertyChangedBase {
+        <<abstract>>
+        -_properties : Dictionary~string, object~
+        #GetValue~T~(propertyName) T
+        #SetValue~T~(value, propertyName) bool
+    }
+
     class PersonModel {
-        +int Id
-        +string Name
-        +int Age
+        +Id : int
+        +Name : string
+        +Age : int
+        +ToString() string
     }
 
     class PersonDirectoryViewModel {
-        -messageBoxService : IMessageBoxService
-        -dataSourceService : IDataSourceService
+        -_messageBoxService : IMessageBoxService
+        -_dataSourceService : IDataSourceService
         +Persons : IList~PersonModel~
         +Person : PersonModel
         +ShowPersonCommand : RelayCommand
@@ -173,7 +233,7 @@ classDiagram
     }
 
     class MainViewModel {
-        -windowFactory : IWindowServiceFactory
+        -_windowFactory : IWindowServiceFactory
         +ShowPersonDirectoryCommand : RelayCommand
         -ExecuteShowPersonDirectoryCommand(parameter)
     }
@@ -185,19 +245,12 @@ classDiagram
         +RaiseCanExecuteChanged()
     }
 
-    class NotifyPropertyChangedBase {
-        <<abstract>>
-        +PropertyChanged : event
-        #OnPropertyChanged(propertyName)
-        #SetProperty(field, value, propertyName) bool
-    }
-
     class IWindowServiceFactory {
         <<interface>>
         +CreatePersonDirectoryWindow() IWindowService
     }
     class WindowServiceFactory {
-        -scope : ILifetimeScope
+        -_scope : ILifetimeScope
         +CreatePersonDirectoryWindow() IWindowService
     }
 
@@ -215,19 +268,21 @@ classDiagram
         +Show()
         +Show(owner)
         +ShowDialog() WindowActionResult
+        +ShowDialog(owner) WindowActionResult
     }
 
     class PersonDirectoryView {
         <<Form>>
-        -viewModel : PersonDirectoryViewModel
+        -_personDirectoryViewModel : PersonDirectoryViewModel
     }
     class MainView {
         <<Form>>
-        -viewModel : MainViewModel
+        -_viewModel : MainViewModel
     }
 
-    NotifyPropertyChangedBase <|-- PersonModel
-    NotifyPropertyChangedBase <|-- PersonDirectoryViewModel
+    NotifyPropertyChangedBase <|-- DynamicNotifyPropertyChangedBase
+    DynamicNotifyPropertyChangedBase <|-- PersonModel
+    DynamicNotifyPropertyChangedBase <|-- PersonDirectoryViewModel
     NotifyPropertyChangedBase <|-- MainViewModel
 
     IDataSourceService <|.. DataSourceService
@@ -235,18 +290,19 @@ classDiagram
     IWindowService <|.. WindowService
     IWindowServiceFactory <|.. WindowServiceFactory
 
-    DataSourceService --> PersonModel : returns
-    PersonDirectoryViewModel --> IDataSourceService : depends on
-    PersonDirectoryViewModel --> IMessageBoxService : depends on
-    PersonDirectoryViewModel --> PersonModel : binds
-    PersonDirectoryViewModel --> RelayCommand : exposes
-    MainViewModel --> IWindowServiceFactory : depends on
-    MainViewModel --> RelayCommand : exposes
-    WindowServiceFactory --> PersonDirectoryViewModel : creates
-    WindowServiceFactory --> PersonDirectoryView : creates
-    PersonDirectoryView --> PersonDirectoryViewModel : data binding
-    MainView --> MainViewModel : data binding
-    PersonDirectoryView --|> WindowService : inherits
+    DataSourceService --> PersonModel : возвращает
+    PersonDirectoryViewModel --> IDataSourceService : зависит от
+    PersonDirectoryViewModel --> IMessageBoxService : зависит от
+    PersonDirectoryViewModel --> PersonModel : привязка
+    PersonDirectoryViewModel --> RelayCommand : выставляет
+    MainViewModel --> IWindowServiceFactory : зависит от
+    MainViewModel --> RelayCommand : выставляет
+    WindowServiceFactory --> PersonDirectoryViewModel : создаёт
+    WindowServiceFactory --> PersonDirectoryView : создаёт
+    PersonDirectoryView --> PersonDirectoryViewModel : привязка данных
+    MainView --> MainViewModel : привязка данных
+    PersonDirectoryView --|> WindowService : наследует
+    MainView --|> WindowService : наследует
 
     style IDataSourceService fill:#70ad47,color:#fff
     style IMessageBoxService fill:#70ad47,color:#fff
@@ -258,49 +314,75 @@ classDiagram
 
 ---
 
-## Dependency Injection (Autofac)
+## Внедрение зависимостей (Autofac)
 
-The container is built once at application startup in `CompositionRoot.BuildContainer()`. Services are registered as **named singletons** and resolved through a lifetime scope that lives for the whole application run.
+Контейнер строится один раз при запуске приложения в `CompositionRoot.BuildContainer()`. Сервисы регистрируются как **named singletons** и разрешаются через lifetime scope, живущий всё время работы приложения.
 
 ```mermaid
 flowchart LR
-    Start["Program.Main"] --> Build["CompositionRoot.BuildContainer"]
-    Build --> Scope["BeginLifetimeScope"]
-    Scope --> Factory["WindowServiceFactory(scope)"]
+    Start["Program.Main"] --> Build["CompositionRoot.BuildContainer()"]
+    Build --> Scope["BeginLifetimeScope()"]
+    Scope --> Factory["new WindowServiceFactory(scope)"]
+    Factory --> Main["new MainViewModel(factory)<br/>new MainView(viewModel)<br/>Application.Run"]
     Factory --> Resolve["ResolveNamed<br/>MessageBoxService / DataSourceService"]
-    Resolve --> Window["MainView + MainViewModel<br/>Application.Run"]
+    Resolve --> Window["new PersonDirectoryViewModel(...)<br/>new PersonDirectoryView(...)"]
 ```
 
-Registrations (`CompositionRoot.cs`):
+### Регистрации (`CompositionRoot.cs`)
 
-| Service | Registration | Lifetime |
+| Сервис | Регистрация | Lifetime |
 |---|---|---|
 | `MessageBoxService` | named `Constants.MessageBoxServiceName` → `IMessageBoxService` | Singleton |
 | `DataSourceService` | named `Constants.DataSourceServiceName` → `IDataSourceService` | Singleton |
 
-`WindowServiceFactory` is the only place (besides `Program`) that knows about Autofac: it resolves services from the scope and composes View + ViewModel pairs, so Views and ViewModels stay container-agnostic.
+### Поток создания окна
+
+`WindowServiceFactory.CreatePersonDirectoryWindow()`:
+1. `ResolveNamed<IMessageBoxService>(Constants.MessageBoxServiceName)` из scope
+2. `ResolveNamed<IDataSourceService>(Constants.DataSourceServiceName)` из scope
+3. `new PersonDirectoryViewModel(messageBoxService, dataSourceService)`
+4. `new PersonDirectoryView(viewModel)` — возвращает как `IWindowService`
+
+`WindowServiceFactory` — единственное место (кроме `Program`), знающее про Autofac: View и ViewModel остаются независимыми от контейнера.
+
+### Соглашение по добавлению нового окна
+
+1. Создать View (наследник `WindowService`) и ViewModel.
+2. Добавить метод в `IWindowServiceFactory` / `WindowServiceFactory`.
+3. При необходимости зарегистрировать новые сервисы в `CompositionRoot`.
 
 ---
 
-## Build and Run
+## Сборка и запуск
 
 ```bash
-# Build (requires .NET Framework 4.7 targeting pack / Visual Studio)
+# Сборка (требуется .NET Framework 4.8 targeting pack / Visual Studio)
 dotnet build MvvmWinFormsApp.sln
 
-# Run
+# Запуск
 dotnet run --project MvvmWinFormsApp
 ```
 
-The application opens the MDI main window (`MainView`). The button bound to `ShowPersonDirectoryCommand` opens the person directory window (`PersonDirectoryView`) as an MDI child; selecting a person and pressing «Show» displays the person's details via `IMessageBoxService`.
+Приложение открывает MDI-главное окно (`MainView`). Пункт меню **«Модули → Справочник персон»** или кнопка на панели инструментов открывает окно справочника (`PersonDirectoryView`) как MDI-потомок. Выбор строки в таблице и нажатие кнопки **«Просмотр»** на панели навигации отображает данные персоны (`Id`, `Name`, `Age`) через `IMessageBoxService`.
 
-### NuGet Packages
+### NuGet-пакеты
 
-| Package | Purpose |
-|---|---|
-| `Autofac` 8.2.0 | Dependency injection container |
-| `Autofac.Extras.CommonServiceLocator` 6.1.0 | CommonServiceLocator adapter for Autofac |
-| `Microsoft.Bcl.AsyncInterfaces`, `System.Memory`, `System.Threading.Tasks.Extensions`, `System.Diagnostics.DiagnosticSource` | Backported async/disposable support for .NET Framework 4.7 |
+| Пакет | Версия | Назначение |
+|---|---|---|
+| `Autofac` | 8.2.0 | Контейнер внедрения зависимостей |
+| `Autofac.Extras.CommonServiceLocator` | 6.1.0 | Адаптер CommonServiceLocator для Autofac |
+| `Microsoft.Bcl.AsyncInterfaces` | 9.0.3 | Бэкпорт async-интерфейсов для net48 |
+| `System.Diagnostics.DiagnosticSource` | 9.0.3 | Диагностика |
+| `System.Memory` | 4.6.2 | Бэкпорт Span/Memory для net48 |
+| `System.Threading.Tasks.Extensions` | 4.6.2 | Бэкпорт ValueTask для net48 |
 
-> Note: the project also references legacy **Infragistics v9.1** assemblies (Shared / Win / Win.Misc) — they must be available in the GAC or next to the project to compile.
+---
+
+## Известные особенности
+
+- `DataSourceService.GetPersons()` возвращает захардкоженный список из трёх персон — при переходе к реальным данным достаточно заменить реализацию `IDataSourceService`.
+- `Constants.PersonDirectoryViewName` объявлен, но пока нигде не используется.
+- `Autofac.Extras.CommonServiceLocator` подключён как пакет, но в коде не задействован.
+- Файл `Common/RelayCommand.cs` лежит в папке `Common`, но имеет namespace `MvvmWinFormsApp.Commands`.
+- Тестовый проект отсутствует.
 
