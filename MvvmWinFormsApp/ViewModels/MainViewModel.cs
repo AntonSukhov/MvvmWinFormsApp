@@ -1,5 +1,5 @@
-﻿using MvvmWinFormsApp.Commands;
-using MvvmWinFormsApp.Common;
+﻿using Infrastructure.Foundation.Bindings;
+using Infrastructure.Foundation.Commands;
 using MvvmWinFormsApp.Factories;
 using MvvmWinFormsApp.Services;
 using System;

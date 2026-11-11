@@ -1,8 +1,8 @@
-﻿using MvvmWinFormsApp.Common;
+﻿using Infrastructure.Foundation.Bindings;
 
 namespace MvvmWinFormsApp.Models
 {
-    public class PersonModel : DynamicNotifyPropertyChangedBase
+    public class PersonModel : NotifyPropertyChangedValueStoreBase
     {
         public int Id
         {

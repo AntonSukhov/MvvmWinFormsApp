@@ -1,5 +1,5 @@
-﻿using MvvmWinFormsApp.Commands;
-using MvvmWinFormsApp.Common;
+﻿using Infrastructure.Foundation.Bindings;
+using Infrastructure.Foundation.Commands;
 using MvvmWinFormsApp.Models;
 using MvvmWinFormsApp.Services;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace MvvmWinFormsApp.ViewModels
 {
-    public class PersonDirectoryViewModel : DynamicNotifyPropertyChangedBase
+    public class PersonDirectoryViewModel : NotifyPropertyChangedValueStoreBase
     {
         private readonly IMessageBoxService _messageBoxService;
         private readonly IDataSourceService _dataSourceService;
